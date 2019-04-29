@@ -278,6 +278,18 @@ var tgs = (function() {
     });
   }
 
+  function closeAllSuspendedTabs() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.windows.get(tabs[0].windowId, { populate: true }, function (currentWindow) {
+        currentWindow.tabs.forEach(function (tab) {
+          if (isSuspendedTab(tab)) {
+            chrome.tabs.remove(tab.id);
+          }
+        })
+      })
+    });
+  }
+
   function unwhitelistHighlightedTab(callback) {
     getCurrentlyActiveTab(function(activeTab) {
       if (activeTab) {
@@ -1607,6 +1619,8 @@ var tgs = (function() {
         suspendAllTabsInAllWindows(true);
       } else if (command === '6-unsuspend-all-windows') {
         unsuspendAllTabsInAllWindows();
+      } else if (command === '7-close-all-suspended') {
+        closeAllSuspendedTabs();
       }
     });
   }
